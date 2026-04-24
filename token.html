@@ -2,20 +2,25 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>Получение Twitch токена</title>
+    <title>Twitch токен для бота</title>
     <style>
         body { font-family: Arial; max-width: 600px; margin: 50px auto; text-align: center; }
         .token { word-break: break-all; background: #f0f0f0; padding: 10px; margin: 20px; }
+        .error { color: red; }
     </style>
 </head>
 <body>
     <h1>Токен для Twitch бота</h1>
-    <p>Нажми кнопку, авторизуйся под своим стримерским аккаунтом и скопируй токен из адресной строки.</p>
-    <button onclick="authorize()">Авторизоваться через Twitch</button>
+    <p>Нажми кнопку и авторизуйся под своим стримерским аккаунтом.</p>
+    <!-- Кнопка, которая запускает процесс авторизации -->
+    <button onclick="authorize()" style="padding: 10px 20px; font-size: 16px;">Авторизоваться через Twitch</button>
+    <div id="error"></div>
 
     <script>
-        const CLIENT_ID = 'd7ma9xrzocrpvyzn022gw9ud18fkhx';  // замени на свой!
-        const REDIRECT_URI = window.location.origin + window.location.pathname;
+        // Обязательно замени 'ТВОЙ_TWITCH_CLIENT_ID' на свой Client ID
+        const CLIENT_ID = 'd7ma9xrzocrpvyzn022gw9ud18fkhx';  
+        // Текущий URL страницы (используется как redirect_uri)
+        const REDIRECT_URI = window.location.href.split('?')[0]; 
 
         function authorize() {
             const url = 'https://id.twitch.tv/oauth2/authorize?' +
@@ -23,22 +28,28 @@
                 '&redirect_uri=' + encodeURIComponent(REDIRECT_URI) +
                 '&response_type=token' +
                 '&scope=chat:read+chat:edit';
+            console.log('Перенаправление на:', url);
             window.location.href = url;
         }
 
-        // Проверяем, есть ли токен в URL (после редиректа)
-        if (window.location.hash) {
-            const params = new URLSearchParams(window.location.hash.substring(1));
-            const token = params.get('access_token');
-            if (token) {
-                document.body.innerHTML = `
-                    <h1>✅ Токен получен!</h1>
-                    <p>Скопируй его и отправь администратору бота:</p>
-                    <div class="token">oauth:${token}</div>
-                    <p><small>Токен действителен ~4 часа. Для продления потребуется повторная авторизация.</small></p>
-                `;
+        // Функция вызывается при загрузке страницы, чтобы проверить, есть ли токен в адресе
+        window.onload = function() {
+            if (window.location.hash) {
+                const params = new URLSearchParams(window.location.hash.substring(1));
+                const token = params.get('access_token');
+                const error = params.get('error');
+                if (token) {
+                    document.body.innerHTML = `
+                        <h1>✅ Токен получен!</h1>
+                        <p>Скопируй его и отправь администратору бота:</p>
+                        <div class="token">oauth:${token}</div>
+                        <p><small>Токен действителен ~4 часа. Для продления потребуется повторная авторизация.</small></p>
+                    `;
+                } else if (error) {
+                    document.getElementById('error').innerHTML = `<p class="error">Ошибка: ${error} - ${params.get('error_description') || ''}</p>`;
+                }
             }
-        }
+        };
     </script>
 </body>
 </html>
