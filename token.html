@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Получение Twitch токена</title>
+    <style>
+        body { font-family: Arial; max-width: 600px; margin: 50px auto; text-align: center; }
+        .token { word-break: break-all; background: #f0f0f0; padding: 10px; margin: 20px; }
+    </style>
+</head>
+<body>
+    <h1>Токен для Twitch бота</h1>
+    <p>Нажми кнопку, авторизуйся под своим стримерским аккаунтом и скопируй токен из адресной строки.</p>
+    <button onclick="authorize()">Авторизоваться через Twitch</button>
+
+    <script>
+        const CLIENT_ID = 'd7ma9xrzocrpvyzn022gw9ud18fkhx';  // замени на свой!
+        const REDIRECT_URI = window.location.origin + window.location.pathname;
+
+        function authorize() {
+            const url = 'https://id.twitch.tv/oauth2/authorize?' +
+                'client_id=' + CLIENT_ID +
+                '&redirect_uri=' + encodeURIComponent(REDIRECT_URI) +
+                '&response_type=token' +
+                '&scope=chat:read+chat:edit';
+            window.location.href = url;
+        }
+
+        // Проверяем, есть ли токен в URL (после редиректа)
+        if (window.location.hash) {
+            const params = new URLSearchParams(window.location.hash.substring(1));
+            const token = params.get('access_token');
+            if (token) {
+                document.body.innerHTML = `
+                    <h1>✅ Токен получен!</h1>
+                    <p>Скопируй его и отправь администратору бота:</p>
+                    <div class="token">oauth:${token}</div>
+                    <p><small>Токен действителен ~4 часа. Для продления потребуется повторная авторизация.</small></p>
+                `;
+            }
+        }
+    </script>
+</body>
+</html>
