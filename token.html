@@ -115,6 +115,11 @@
                          <p><b>Refresh Token (TWITCH_REFRESH_TOKEN):</b></p>
                          <div class="token">${tokenData.refresh_token}</div>
                          <p>Скопируй оба токена и отправь администратору бота.</p>`;
+                        console.log('Обмен кода с параметрами:');
+                        console.log('client_id:', CLIENT_ID);
+                        console.log('code:', code);
+                        console.log('redirect_uri:', REDIRECT_URI);
+                        console.log('code_verifier:', codeVerifier);
                 } else {
                     document.getElementById('result').innerHTML = 
                         `<p class="error">Ошибка получения токенов: ${JSON.stringify(tokenData)}</p>`;
